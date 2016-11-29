@@ -9,7 +9,7 @@ C# script and prefabs to control  camera  and/or  character object in Unity3D, e
 A. Character
   1. CharMoveRotLerp.cs
     : objects can move forward and backward, and rotate left/right smoothly
-
+    
   2. CharMoveRotDegree.cs  
     : objects can move forward and backward, and rotate left/right in certain degrees
 
