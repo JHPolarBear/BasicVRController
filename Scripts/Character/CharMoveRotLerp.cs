@@ -46,8 +46,8 @@ public class CharMoveRotLerp : MonoBehaviour {
         //save current vertical input value into vrtVal 
         vrtVal = Input.GetAxis("Vertical");
 
-        //vrtVal 값에 따라 현재 전진하는지 후진하는지를 판단한 후,
-        //후진일 경우 캐릭터 스피드/4 에 해당하는 값을 대입하여 걷는 효과 부여
+        //Judge whether the object move forward or backward using vrtVal
+        //If it moves backwards, reduce object speed into 1/4
         if (vrtVal > 0)
         {
             speedFixed = speed;
@@ -57,42 +57,41 @@ public class CharMoveRotLerp : MonoBehaviour {
             speedFixed = speed / 4;
         }
 
-        //최종적으로 캐릭터가 이동해야할 방향 벡터를 계산
+        //Calculate direction vector for character to move
         Vector3 direction = transform.forward.normalized * speedFixed * vrtVal;
 
-        //점프 버튼 입력 시 점프 횟수가 남아있는 경우에만 점프 실행
+        //Only jump if jumpcount > 0
         if (Input.GetButtonDown("Jump") && jumpCount > 0)
         {
             Jump();
             jumpCount--;
         }
 
-        //캐릭터의 위치 변경
+        //move the character
         characterController.Move(direction * Time.deltaTime);
 
         //Set animation
-        //캐릭터의 속력이 증가하면 달리는 애니메이션 실행
+        //Running animation value
         animator.SetFloat("Run", characterController.velocity.magnitude);
 
-        //점프 카운트가 0인 경우 점프 애니메이션 실행
-        //만약 다중 점프를 구현한다면 Animator에서 조건 변경 필요
+        //activate jump animation only when jumpcount equals 0
+        //It need to be fixed if we implement muti-time jump later
         animator.SetInteger("Jump", jumpCount);
 
-        //만약 VrtVal 값이 음수인 경우, 뛰는 모션 대신 걷는 모션 실행
+        //Walking animation when VrtVal is negative, which mease walk backward 
         animator.SetInteger("Walk", (int)vrtVal);
     }
 
     void Jump()
     {
-        //현재 위치에 Up 벡터에 점프 높이를 곱한만큼을 더한다
+        //multiply jump height and up vector, then add to current position
         Vector3 dir = transform.position + transform.up * jumpHeight;
 
-        //Lerp 함수를 활용하여 점프 시작 시에는 높이 올라가다가
-        //올라갈수록 증가하는 높이를 감소시켰다.
+        //Using Lerp function to implement jump affected by gravity
         transform.position = Vector3.Lerp(transform.position, dir, jumpPower * Time.deltaTime);
     }
 
-    //캐릭터가 땅에 닿는 경우 점프 카운트를 1로 증가시킴
+    //add 1 to jumpcount when object touches the ground after jump
     void OnControllerColliderHit(ControllerColliderHit col)
     {
         if (col.gameObject.tag == "Terrain")
